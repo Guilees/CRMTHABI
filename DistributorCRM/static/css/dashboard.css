@@ -1,0 +1,145 @@
+/* Dashboard specific styles */
+
+.dashboard-stat-card {
+    border-radius: 10px;
+    transition: transform 0.3s;
+    border: none;
+}
+
+.dashboard-stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.dashboard-stat-card .card-body {
+    padding: 1.5rem;
+}
+
+.dashboard-stat-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.dashboard-stat-card .display-4 {
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.dashboard-stat-card .icon-container {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Chart containers */
+.chart-container {
+    position: relative;
+    height: 250px;
+    margin-bottom: 1rem;
+}
+
+/* Calendar styles */
+#calendarContainer {
+    background-color: #262626;
+    border-radius: 0.25rem;
+    padding: 1rem;
+}
+
+#paymentsCalendar {
+    color: #fff;
+}
+
+/* Tables for recent data */
+.recent-data-table th, .recent-data-table td {
+    padding: 0.5rem 0.75rem;
+}
+
+.status-badge {
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 700;
+    border-radius: 0.25rem;
+}
+
+/* Reminder cards */
+.reminder-card {
+    border-left: 4px solid #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-radius: 0.25rem;
+}
+
+.reminder-card.due-soon {
+    border-left-color: #ffc107;
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+.reminder-card.paid {
+    border-left-color: #198754;
+    background-color: rgba(25, 135, 84, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .dashboard-stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .chart-container {
+        height: 200px;
+    }
+}
+
+/* Chart tooltips */
+.chartjs-tooltip {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: 3px;
+    padding: 6px 12px;
+    font-size: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+    pointer-events: none;
+}
+
+/* Activity feed */
+.activity-feed {
+    padding: 0;
+    list-style: none;
+}
+
+.activity-feed li {
+    position: relative;
+    padding-left: 30px;
+    padding-bottom: 15px;
+    border-left: 2px solid #0d6efd;
+    margin-left: 10px;
+}
+
+.activity-feed li:last-child {
+    border-left: 2px solid transparent;
+}
+
+.activity-feed li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #0d6efd;
+}
+
+.activity-feed .time {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.activity-feed .action {
+    font-weight: 600;
+}

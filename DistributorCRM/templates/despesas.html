@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="display-5 fw-bold"><i class="fas fa-receipt"></i> Despesas</h1>
+        <p class="lead">Gerencie as despesas da sua distribuidora</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <button type="button" class="btn btn-primary btn-lg me-2" data-bs-toggle="modal" data-bs-target="#modalAdicionarDespesa">
+            <i class="fas fa-plus-circle"></i> Adicionar Despesa
+        </button>
+        <button type="button" class="btn btn-success btn-lg me-2" id="btnExportarDespesas">
+            <i class="fas fa-file-export"></i> Exportar
+        </button>
+    </div>
+</div>
+
+<!-- Filtros e busca -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-search"></i> Buscar Despesas</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="dataInicio" class="form-label">Data inicial</label>
+                <input type="date" class="form-control" id="dataInicio">
+            </div>
+            <div class="col-md-3">
+                <label for="dataFim" class="form-label">Data final</label>
+                <input type="date" class="form-control" id="dataFim">
+            </div>
+            <div class="col-md-3">
+                <label for="filtroCategoria" class="form-label">Categoria</label>
+                <select class="form-select" id="filtroCategoria">
+                    <option value="">Todas as categorias</option>
+                    {% for categoria in categorias %}
+                    <option value="{{ categoria.nome }}">{{ categoria.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filtroFornecedor" class="form-label">Fornecedor</label>
+                <select class="form-select" id="filtroFornecedor">
+                    <option value="">Todos os fornecedores</option>
+                    {% for fornecedor in fornecedores %}
+                    <option value="{{ fornecedor.id }}">{{ fornecedor.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="button" id="btnBuscarDespesa" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+                <button type="button" id="btnLimparBusca" class="btn btn-secondary">
+                    <i class="fas fa-eraser"></i> Limpar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Listagem de despesas -->
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Lista de Despesas</h5>
+            <div>
+                <span class="badge bg-primary me-2" id="totalDespesas">Total: {{ despesas|length }}</span>
+                <span class="badge bg-danger" id="valorTotalDespesas">R$ {{ "%.2f"|format(despesas|sum(attribute='valor')|float)|replace('.', ',') if despesas else '0,00' }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0" id="tabelaDespesas">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                        <th>Data</th>
+                        <th>Categoria</th>
+                        <th>Fornecedor</th>
+                        <th>Status</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for despesa in despesas %}
+                    <tr data-id="{{ despesa.id }}">
+                        <td>{{ despesa.id }}</td>
+                        <td>{{ despesa.descricao }}</td>
+                        <td>R$ {{ "%.2f"|format(despesa.valor)|replace('.', ',') }}</td>
+                        <td>{{ despesa.data }}</td>
+                        <td>{{ despesa.categoria }}</td>
+                        <td>{{ despesa.fornecedor_nome }}</td>
+                        <td>
+                            <span class="badge {% if despesa.status == 'pago' %}bg-success{% elif despesa.status == 'pendente' %}bg-warning{% elif despesa.status == 'atrasado' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                {{ despesa.status }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-info btn-sm btn-editar" 
+                                    data-id="{{ despesa.id }}"
+                                    data-descricao="{{ despesa.descricao }}"
+                                    data-valor="{{ despesa.valor }}"
+                                    data-data="{{ despesa.data }}"
+                                    data-categoria="{{ despesa.categoria }}"
+                                    data-status="{{ despesa.status }}"
+                                    data-fornecedor_id="{{ despesa.fornecedor_id or '' }}"
+                                    data-numero_nota="{{ despesa.numero_nota or '' }}"
+                                    data-vencimento="{{ despesa.vencimento or '' }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm btn-excluir" 
+                                    data-id="{{ despesa.id }}"
+                                    data-descricao="{{ despesa.descricao }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center">Nenhuma despesa registrada</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar Despesa -->
+<div class="modal fade" id="modalAdicionarDespesa" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-plus-circle"></i> Adicionar Despesa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('adicionar_despesa') }}" method="POST">
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="descricao" class="form-label">Descrição*</label>
+                            <input type="text" class="form-control" id="descricao" name="descricao" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="valor" class="form-label">Valor (R$)*</label>
+                            <input type="number" class="form-control" id="valor" name="valor" min="0.01" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="data" class="form-label">Data*</label>
+                            <input type="date" class="form-control" id="data" name="data" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="categoria" class="form-label">Categoria*</label>
+                            <select class="form-select" id="categoria" name="categoria" required>
+                                <option value="" selected disabled>Selecione uma categoria</option>
+                                {% for categoria in categorias %}
+                                <option value="{{ categoria.nome }}">{{ categoria.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="status" class="form-label">Status*</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="pendente">Pendente</option>
+                                <option value="pago">Pago</option>
+                                <option value="atrasado">Atrasado</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="associarFornecedor">
+                            <label class="form-check-label" for="associarFornecedor">
+                                Esta despesa está associada a um fornecedor
+                            </label>
+                        </div>
+                    </div>
+                    <div id="infoFornecedorContainer" style="display:none;">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="fornecedor_id" class="form-label">Fornecedor</label>
+                                <select class="form-select" id="fornecedor_id" name="fornecedor_id">
+                                    <option value="">Selecione um fornecedor</option>
+                                    {% for fornecedor in fornecedores %}
+                                    <option value="{{ fornecedor.id }}">{{ fornecedor.nome }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="numero_nota" class="form-label">Número da Nota (opcional)</label>
+                                <input type="text" class="form-control" id="numero_nota" name="numero_nota">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="temVencimento">
+                            <label class="form-check-label" for="temVencimento">
+                                Esta despesa tem vencimento
+                            </label>
+                        </div>
+                    </div>
+                    <div id="vencimentoContainer" style="display:none;">
+                        <div class="mb-3">
+                            <label for="vencimento" class="form-label">Data de Vencimento</label>
+                            <input type="date" class="form-control" id="vencimento" name="vencimento">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Despesa -->
+<div class="modal fade" id="modalEditarDespesa" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="fas fa-edit"></i> Editar Despesa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditarDespesa" method="POST">
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="edit_descricao" class="form-label">Descrição*</label>
+                            <input type="text" class="form-control" id="edit_descricao" name="descricao" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit_valor" class="form-label">Valor (R$)*</label>
+                            <input type="number" class="form-control" id="edit_valor" name="valor" min="0.01" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="edit_data" class="form-label">Data*</label>
+                            <input type="date" class="form-control" id="edit_data" name="data" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit_categoria" class="form-label">Categoria*</label>
+                            <select class="form-select" id="edit_categoria" name="categoria" required>
+                                {% for categoria in categorias %}
+                                <option value="{{ categoria.nome }}">{{ categoria.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit_status" class="form-label">Status*</label>
+                            <select class="form-select" id="edit_status" name="status" required>
+                                <option value="pendente">Pendente</option>
+                                <option value="pago">Pago</option>
+                                <option value="atrasado">Atrasado</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="edit_fornecedor_id" class="form-label">Fornecedor</label>
+                            <select class="form-select" id="edit_fornecedor_id" name="fornecedor_id">
+                                <option value="">Nenhum fornecedor</option>
+                                {% for fornecedor in fornecedores %}
+                                <option value="{{ fornecedor.id }}">{{ fornecedor.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_numero_nota" class="form-label">Número da Nota</label>
+                            <input type="text" class="form-control" id="edit_numero_nota" name="numero_nota">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_vencimento" class="form-label">Data de Vencimento</label>
+                        <input type="date" class="form-control" id="edit_vencimento" name="vencimento">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-info">Atualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmar Exclusão -->
+<div class="modal fade" id="modalConfirmarExclusao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir a despesa <strong id="descricaoDespesaExcluir"></strong>?</p>
+                <p class="text-danger">Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">Confirmar Exclusão</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/despesas.js') }}"></script>
+{% endblock %}

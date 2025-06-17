@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Página Não Encontrada - THABI CRM{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="error-page">
+                <h1 class="display-1 text-primary">404</h1>
+                <h2 class="mb-3">Página Não Encontrada</h2>
+                <p class="lead mb-4">
+                    A página que você está procurando não existe ou foi movida.
+                </p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary me-md-2">
+                        <i class="fas fa-home"></i> Voltar ao Dashboard
+                    </a>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Página Anterior
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,267 @@
+[
+    {
+        "id": 1,
+        "nome": "PASTORINHO PIRITUBA",
+        "numero_loja": "01",
+        "cnpj": "00000000000252",
+        "grupo": "GRUPO PASTORINHO"
+    },
+    {
+        "id": 2,
+        "nome": "PASTORINHO SANTANA",
+        "numero_loja": "02",
+        "cnpj": "00000000001909",
+        "grupo": "GRUPO PASTORINHO"
+    },
+    {
+        "id": 3,
+        "nome": "PASTORINHO MARIANA",
+        "numero_loja": "03",
+        "cnpj": "00000000002387",
+        "grupo": "GRUPO PASTORINHO"
+    },
+    {
+        "id": 4,
+        "nome": "PASTORINHO PERDIZES",
+        "numero_loja": "04",
+        "cnpj": "00000000002204",
+        "grupo": "GRUPO PASTORINHO"
+    },
+    {
+        "id": 5,
+        "nome": "SUPERMECADO X 1",
+        "numero_loja": "01",
+        "cnpj": "00000000000170",
+        "grupo": "GRUPO X"
+    },
+   {
+        "id": 6,
+        "nome": "SUPERMECADO X 2",
+        "numero_loja": "02",
+        "cnpj": "00000000000846",
+        "grupo": "GRUPO X"
+    },
+   {
+        "id": 7,
+        "nome": "SUPERMECADO X 3",
+        "numero_loja": "03",
+        "cnpj": "00000000000501",
+        "grupo": "GRUPO X"
+    },
+   {
+        "id": 8,
+        "nome": "SUPERMECADO X 4",
+        "numero_loja": "04",
+        "cnpj": "00000000001222",
+        "grupo": "GRUPO X"
+    },
+   {
+        "id": 9,
+        "nome": "SUPERMECADO X 5",
+        "numero_loja": "05",
+        "cnpj": "00000000000765",
+        "grupo": "GRUPO X"
+    },
+   {
+        "id": 10,
+        "nome": "SUPERMECADO X 6",
+        "numero_loja": "06",
+        "cnpj": "00000000000250",
+        "grupo": "GRUPO X"
+    },
+   {
+        "id": 11,
+        "nome": "SUPERMECADO X 7",
+        "numero_loja": "07",
+        "cnpj": "00000000000684",
+        "grupo": "GRUPO X"
+    },
+   {
+        "id": 12,
+        "nome": "SUPERMECADO X 8",
+        "numero_loja": "08",
+        "cnpj": "00000000000331",
+        "grupo": "GRUPO X"
+    },
+   {
+        "id": 13,
+        "nome": "SUPERMECADO X 9",
+        "numero_loja": "09",
+        "cnpj": "00000000000412",
+        "grupo": "GRUPO X"
+    },
+    {
+        "id": 14,
+        "nome": "SUPERMECADO X 10",
+        "numero_loja": "10",
+        "cnpj": "00000000000927",
+        "grupo": "GRUPO X"
+    },
+   {
+        "id": 15,
+        "nome": "SUPERMECADO X 11",
+        "numero_loja": "11",
+        "cnpj": "00000000001060",
+        "grupo": "GRUPO X"
+    },
+
+   {
+        "id":16,
+        "nome": "SUPERMECADO X 12",
+        "numero_loja": "12",
+        "cnpj": "00000000001141",
+        "grupo": "GRUPO X"
+    },
+
+   {
+        "ID": 17,
+        "nome": "SUPERMECADO X 13",
+        "numero_loja": "13",
+        "cnpj": "00000000001303",
+        "grupo": "GRUPO X"
+    },
+   {
+        "id": 18,
+        "nome": "SUPERMECADO X 15",
+        "numero_loja": "15",
+        "cnpj": "00000000001656",
+        "grupo": "GRUPO X"
+    },
+
+   {
+        "id": 19,
+        "nome": "SUPERMECADO X 17",
+        "numero_loja": "17",
+        "cnpj": "00000000001818",
+        "grupo": "GRUPO X"
+    },
+
+   {
+        "id": 20,
+        "nome": "SUPERMECADO X 18",
+        "numero_loja": "18",
+        "cnpj": "00000000000170",
+        "grupo": "GRUPO X"
+    },
+
+    {
+        "id": 21,
+        "nome": "KYO 1",
+        "numero_loja": "01",
+        "cnpj": "00000000001907",
+        "grupo": "GRUPO KYO"
+    },
+    {
+        "id": 22,
+        "nome": "NELSON 2",
+        "numero_loja": "02",
+        "cnpj": "00000000000002",
+        "grupo": "GRUPO KYO"
+    },
+    {
+        "id": 23,
+        "nome": "CECILIA 3",
+        "numero_loja": "03",
+        "cnpj": "00000000000003",
+        "grupo": "GRUPO KYO"
+    },
+    {
+        "id": 24,
+        "nome": "MERCES 4",
+        "numero_loja": "04",
+        "cnpj": "00000000000004",
+        "grupo": "GRUPO KYO"
+    },
+    {
+        "id": 25,
+        "nome": "RD 5",
+        "numero_loja": "05",
+        "cnpj": "00000000000005",
+        "grupo": "GRUPO KYO"
+    },
+    {
+        "id": 26,
+        "nome": "GRANJA 6",
+        "numero_loja": "06",
+        "cnpj": "00000000000006",
+        "grupo": "GRUPO KYO"
+    },
+    {
+        "id": 27,
+        "nome": "MASTER FREI",
+        "numero_loja": "01",
+        "cnpj": "00000000000957",
+        "grupo": "GRUPO MASTER"
+    },
+    {
+        "id": 28,
+        "nome": "MASTER RIO GRANDE",
+        "numero_loja": "02",
+        "cnpj": "00000000001252",
+        "grupo": "GRUPO MASTER"
+    },
+    {
+        "id": 29,
+        "nome": "MASTER CUBATAO",
+        "numero_loja": "03",
+        "cnpj": "00000000001333",
+        "grupo": "GRUPO MASTER"
+    },
+    {
+        "id": 30,
+        "nome": "MASTER PEDROSO",
+        "numero_loja": "04",
+        "cnpj": "00000000002224",
+        "grupo": "GRUPO MASTER"
+    },
+    {
+        "id": 31,
+        "nome": "POUPASUPER SUPE",
+        "numero_loja": "01",
+        "cnpj": "00000000000100",
+        "grupo": "GRUPO GPIRES"
+    },
+    {
+        "id": 32,
+        "nome": "G PLUS",
+        "numero_loja": "02",
+        "cnpj": "00000000000200",
+        "grupo": "GRUPO GPIRES"
+    },
+    {
+        "id": 33,
+        "nome": "TUPA",
+        "numero_loja": "03",
+        "cnpj": "00000000000300",
+        "grupo": "GRUPO GPIRES"
+    },
+    {
+        "id": 34,
+        "nome": "MERCADO CENTRAL LTDA",
+        "numero_loja": "04",
+        "cnpj": "00000000000400",
+        "grupo": "GRUPO GPIRES"
+    },
+    {
+        "id": 35,
+        "nome": "G PIRES MISSIONARIA",
+        "numero_loja": "05",
+        "cnpj": "00000000000500",
+        "grupo": "GRUPO GPIRES"
+    },
+    {
+        "id": 36,
+        "nome": "G PIRES MISSIONARIA",
+        "numero_loja": "05",
+        "cnpj": "00000000000500",
+        "grupo": "GRUPO GPIRES"
+    },
+    {
+        "id": 37,
+        "nome": "G PIRES MISSIONARIA",
+        "numero_loja": "05",
+        "cnpj": "00000000000500",
+        "grupo": "GRUPO GPIRES"
+    }
+
+]

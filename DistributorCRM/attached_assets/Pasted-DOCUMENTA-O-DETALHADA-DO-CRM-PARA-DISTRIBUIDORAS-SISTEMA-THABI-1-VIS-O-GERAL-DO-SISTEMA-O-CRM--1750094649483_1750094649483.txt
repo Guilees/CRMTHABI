@@ -1,0 +1,189 @@
+DOCUMENTAÇÃO DETALHADA DO CRM PARA DISTRIBUIDORAS - SISTEMA THABI
+1. VISÃO GERAL DO SISTEMA
+O CRM THABI é um sistema completo para gerenciamento de distribuidoras, focado em controle de clientes, produtos, vendas, despesas e relatórios financeiros. O sistema utiliza uma arquitetura baseada em Flask (Python) no backend, com interface web usando HTML, CSS e JavaScript com Bootstrap para responsividade.
+
+2. ESTRUTURA DO PROJETO
+A estrutura do projeto está organizada da seguinte forma:
+
+CrmManagerthabi/
+├── data/                      # Diretório para armazenamento de dados
+│   ├── vendas.json           # Dados de vendas
+│   ├── clientes.json         # Dados de clientes
+│   ├── categorias.json       # Categorias de despesas
+│   ├── fornecedores.json     # Dados de fornecedores
+│   ├── produtos.json         # Dados de produtos
+│   ├── despesas.json         # Dados de despesas
+│   ├── backups/              # Diretório para backups automáticos
+│   ├── modelos/              # Modelos de documentos
+│   ├── relatorios/           # Relatórios gerados
+├── src/                       # Código-fonte Python do backend
+│   ├── __init__.py           # Inicialização do pacote Python
+│   ├── backup.py             # Gerenciador de backups
+│   ├── categorias.py         # Gerenciador de categorias de despesas
+│   ├── clientes.py           # Gerenciador de clientes
+│   ├── despesas.py           # Gerenciador de despesas
+│   ├── fornecedores.py       # Gerenciador de fornecedores
+│   ├── margens.py            # Cálculos de margens de lucro
+│   ├── produtos.py           # Gerenciador de produtos
+│   ├── relatorios.py         # Gerador de relatórios
+│   ├── utils.py              # Funções utilitárias
+│   ├── vendas.py             # Gerenciador de vendas
+├── static/                    # Arquivos estáticos para a interface web
+│   ├── css/                  # Folhas de estilo CSS
+│   │   ├── dashboard.css     # Estilos do dashboard
+│   │   ├── style.css         # Estilos globais
+│   ├── js/                   # Scripts JavaScript
+│       ├── clientes.js       # Scripts para gerenciamento de clientes
+│       ├── dashboard.js      # Scripts para o dashboard
+│       ├── despesas.js       # Scripts para gerenciamento de despesas
+│       ├── vendas.js         # Scripts para gerenciamento de vendas
+├── templates/                 # Templates HTML
+│   ├── base.html             # Template base (layout)
+│   ├── calculadora.html      # Calculadora de margens
+│   ├── clientes.html         # Gerenciamento de clientes
+│   ├── dashboard.html        # Painel principal
+│   ├── despesas.html         # Gerenciamento de despesas
+│   ├── fornecedores.html     # Gerenciamento de fornecedores
+│   ├── produtos.html         # Gerenciamento de produtos
+│   ├── relatorios.html       # Geração de relatórios
+│   ├── vendas.html           # Gerenciamento de vendas
+├── routes/                    # Rotas do Flask
+│   ├── __init__.py           # Inicialização do pacote de rotas
+│   ├── calculator.py         # Rotas da calculadora de margens
+│   ├── clientes.py           # Rotas de clientes
+│   ├── dashboard.py          # Rotas do dashboard
+│   ├── despesas.py           # Rotas de despesas
+│   ├── fornecedores.py       # Rotas de fornecedores
+│   ├── produtos.py           # Rotas de produtos
+│   ├── relatorios.py         # Rotas de relatórios
+│   ├── vendas.py             # Rotas de vendas
+├── app.py                     # Configuração e inicialização do Flask
+├── main.py                    # Ponto de entrada principal
+├── models.py                  # Modelos SQLAlchemy para banco de dados
+└── backup.py                  # Script para backups manuais
+3. PRINCIPAIS COMPONENTES E FUNCIONALIDADES
+3.1. Gerenciamento de Clientes (src/clientes.py)
+Cadastro completo de clientes com nome, número da loja, CNPJ e grupo
+Consulta, edição e remoção de clientes
+Busca por nome, CNPJ ou número da loja
+Agrupamento de clientes por redes (grupos)
+3.2. Gerenciamento de Fornecedores (src/fornecedores.py)
+Cadastro de fornecedores com nome e CNPJ
+Consulta, edição e remoção de fornecedores
+Busca por nome ou CNPJ
+3.3. Gerenciamento de Produtos (src/produtos.py)
+Cadastro de produtos com nome, valor de compra, valor de venda e associação com fornecedor
+Consulta, edição e remoção de produtos
+Busca por nome
+Cálculo automático de margem de lucro
+3.4. Gerenciamento de Vendas (src/vendas.py)
+Registro de vendas com número de nota, data, cliente, valor total, forma de pagamento e data de vencimento
+Sistema de status de pagamento (pendente, pago, atrasado, cancelado)
+Consulta, edição e remoção de vendas
+Filtros por período, cliente e status de pagamento
+Suporte a bonificações (vendas gratuitas)
+Armazenamento dos produtos vendidos em cada transação
+3.5. Gerenciamento de Despesas (src/despesas.py)
+Registro de despesas com descrição, valor, data, categoria e fornecedor
+Sistema de status de pagamento (pendente, pago, atrasado, cancelado)
+Consulta, edição e remoção de despesas
+Filtros por período, categoria e fornecedor
+3.6. Categorias de Despesas (src/categorias.py)
+Gerenciamento de categorias para classificação de despesas
+Categorias padrão predefinidas para facilitar a classificação
+Consulta, edição e remoção de categorias
+3.7. Calculadora de Margens de Lucro (src/margens.py)
+Cálculos de margens de lucro em porcentagem
+Cálculo de preço de venda baseado na margem desejada
+Cálculos de markup (multiplicador)
+Cálculo de ponto de equilíbrio
+Análise completa de produtos com diversos indicadores
+3.8. Gerador de Relatórios (src/relatorios.py)
+Relatórios de vendas por período
+Relatórios de despesas por período
+Relatórios de lucratividade
+Relatórios por cliente
+Relatórios por produto
+Exportação em formatos Excel, CSV e PDF
+Geração de gráficos para visualização de dados
+3.9. Sistema de Backup (src/backup.py)
+Criação de backups automáticos agendados
+Backups manuais sob demanda
+Armazenamento dos dados em formato Excel para segurança
+3.10. Utilitários (src/utils.py)
+Funções para validação de CNPJ
+Formatação de valores monetários
+Conversão entre formatos de data
+Cálculo de status de pagamento
+Geração de IDs para novas entidades
+4. BANCO DE DADOS
+O sistema utiliza dois tipos de persistência de dados:
+
+4.1. Armazenamento JSON
+Inicialmente, os dados são armazenados em arquivos JSON na pasta data
+Cada entidade (cliente, produto, venda, etc.) possui seu próprio arquivo
+A leitura/escrita é gerenciada pelas classes de negócio correspondentes
+4.2. Banco de Dados SQL (SQLAlchemy)
+Implementação de modelos no models.py para permitir a migração para banco de dados SQL
+Suporte a SQLite (desenvolvimento) e PostgreSQL (produção)
+Mapeamento de todas as entidades do sistema como tabelas relacionais
+5. INTERFACE DE USUÁRIO
+5.1. Dashboard Principal
+Visão geral das métricas do negócio
+Gráficos de vendas por período
+Gráficos de lucro e despesas
+Indicadores de pagamentos pendentes e atrasados
+5.2. Interfaces de Gestão
+Formulários para cadastro e edição de todas as entidades
+Tabelas com paginação para listagem de dados
+Filtros avançados de busca
+Confirmações para operações críticas (exclusões)
+5.3. Interface de Relatórios
+Seleção de tipos de relatórios
+Configuração de parâmetros (período, agrupamento, etc.)
+Visualização de gráficos interativos
+Botões para exportação em diferentes formatos
+5.4. Calculadora de Margens
+Formulários para entrada de dados
+Cálculo em tempo real
+Visualização de diferentes cenários
+6. REQUISITOS TÉCNICOS
+6.1. Dependências Python
+Flask (framework web)
+Flask-SQLAlchemy (ORM para banco de dados)
+psycopg2-binary (driver PostgreSQL)
+pandas (manipulação de dados)
+matplotlib (geração de gráficos)
+schedule (agendamento de tarefas)
+gunicorn (servidor WSGI para produção)
+6.2. Dependências Frontend
+Bootstrap (framework CSS)
+Chart.js (biblioteca de gráficos)
+jQuery (manipulação do DOM e AJAX)
+Font Awesome (ícones)
+6.3. Estrutura Flask
+Arquitetura MVC (Model-View-Controller)
+Uso de Blueprints para organização modular
+Templates Jinja2 para renderização do HTML
+Validação de formulários
+7. FUNCIONALIDADE DE CONSOLE (LEGADO)
+O arquivo main.py na pasta raiz contém uma versão legada do sistema que funciona via console (terminal), com as seguintes características:
+
+Interface baseada em texto com menus numéricos
+Mesmo modelo de negócios da versão web
+Funcionalidades completas, mas sem interface gráfica
+Capacidade de operação offline
+8. CARACTERÍSTICAS AVANÇADAS
+8.1. Sistema de Backup
+Configurado para executar diariamente às 3h da manhã
+Armazena dados em formato Excel para fácil recuperação
+Mantém versões históricas
+8.2. Análise de Lucratividade
+Cálculos avançados de margens e markup
+Comparativos de desempenho por cliente, produto e período
+Projeções e tendências
+8.3. Gestão de Pagamentos
+Monitoramento automático de prazos
+Alertas para pagamentos atrasados
+Status atualizado automaticamente
+Este é um sistema completo para distribuidoras, projetado especificamente para gerenciar todo o ciclo de negócios, desde o cadastro de produtos e fornecedores até a venda e análise de resultados. O sistema foi desenvolvido com uma abordagem modular, permitindo fácil manutenção e expansão.

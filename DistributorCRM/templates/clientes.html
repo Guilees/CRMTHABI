@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="display-5 fw-bold"><i class="fas fa-users"></i> Clientes</h1>
+        <p class="lead">Gerencie os clientes da sua distribuidora</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalAdicionarCliente">
+            <i class="fas fa-plus-circle"></i> Adicionar Cliente
+        </button>
+    </div>
+</div>
+
+<!-- Filtros e busca -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-search"></i> Buscar Clientes</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="termoBusca" class="form-label">Termo de busca</label>
+                <input type="text" class="form-control" id="termoBusca" placeholder="Nome ou número da loja">
+            </div>
+            <div class="col-md-6">
+                <label for="filtroTelefone" class="form-label">Filtrar por telefone</label>
+                <input type="text" class="form-control" id="filtroTelefone" placeholder="Telefone">
+            </div>
+            <div class="col-12">
+                <button type="button" id="btnBuscarCliente" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+                <button type="button" id="btnLimparBusca" class="btn btn-secondary">
+                    <i class="fas fa-eraser"></i> Limpar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Listagem de clientes -->
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="fas fa-list"></i> Lista de Clientes</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0" id="tabelaClientes">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Número da Loja</th>
+                        <th>Telefone</th>
+                        <th>Email</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes %}
+                    <tr data-id="{{ cliente.id }}">
+                        <td>{{ cliente.id }}</td>
+                        <td>{{ cliente.nome }}</td>
+                        <td>{{ cliente.numero_loja }}</td>
+                        <td>{{ cliente.telefone }}</td>
+                        <td>{{ cliente.email or 'N/A' }}</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-info btn-sm btn-editar" 
+                                    data-id="{{ cliente.id }}"
+                                    data-nome="{{ cliente.nome }}"
+                                    data-numero="{{ cliente.numero_loja }}"
+                                    data-endereco="{{ cliente.endereco }}"
+                                    data-telefone="{{ cliente.telefone }}"
+                                    data-email="{{ cliente.email or '' }}"
+                                    data-observacoes="{{ cliente.observacoes or '' }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm btn-excluir" 
+                                    data-id="{{ cliente.id }}"
+                                    data-nome="{{ cliente.nome }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">Nenhum cliente cadastrado</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar Cliente -->
+<div class="modal fade" id="modalAdicionarCliente" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-plus-circle"></i> Adicionar Cliente</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('adicionar_cliente') }}" method="POST">
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="nome" class="form-label">Nome do Cliente*</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="numero_loja" class="form-label">Número da Loja*</label>
+                            <input type="text" class="form-control" id="numero_loja" name="numero_loja" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="endereco" class="form-label">Endereço*</label>
+                        <input type="text" class="form-control" id="endereco" name="endereco" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="telefone" class="form-label">Telefone*</label>
+                            <input type="text" class="form-control" id="telefone" name="telefone" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="observacoes" class="form-label">Observações</label>
+                        <textarea class="form-control" id="observacoes" name="observacoes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Cliente -->
+<div class="modal fade" id="modalEditarCliente" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="fas fa-edit"></i> Editar Cliente</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditarCliente" method="POST">
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="edit_nome" class="form-label">Nome do Cliente*</label>
+                            <input type="text" class="form-control" id="edit_nome" name="nome" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit_numero_loja" class="form-label">Número da Loja*</label>
+                            <input type="text" class="form-control" id="edit_numero_loja" name="numero_loja" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_endereco" class="form-label">Endereço*</label>
+                        <input type="text" class="form-control" id="edit_endereco" name="endereco" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="edit_telefone" class="form-label">Telefone*</label>
+                            <input type="text" class="form-control" id="edit_telefone" name="telefone" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="edit_email" name="email">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_observacoes" class="form-label">Observações</label>
+                        <textarea class="form-control" id="edit_observacoes" name="observacoes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-info">Atualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmar Exclusão -->
+<div class="modal fade" id="modalConfirmarExclusao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o cliente <strong id="nomeClienteExcluir"></strong>?</p>
+                <p class="text-danger">Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">Confirmar Exclusão</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/clientes.js') }}"></script>
+{% endblock %}

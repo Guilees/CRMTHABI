@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='css/dashboard.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </h1>
+        <p class="lead">Visão geral do seu negócio</p>
+    </div>
+</div>
+
+<!-- Cards de Métricas -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card dashboard-stat-card bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Vendas do Mês</h6>
+                        <h2 class="display-4">R$ {{ "%.2f"|format(total_vendas_mes)|replace('.', ',') }}</h2>
+                    </div>
+                    <div class="icon-container">
+                        <i class="fas fa-shopping-cart fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card dashboard-stat-card bg-danger text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Despesas do Mês</h6>
+                        <h2 class="display-4">R$ {{ "%.2f"|format(total_despesas_mes)|replace('.', ',') }}</h2>
+                    </div>
+                    <div class="icon-container">
+                        <i class="fas fa-receipt fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card dashboard-stat-card bg-warning text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Valores Pendentes</h6>
+                        <h2 class="display-4">R$ {{ "%.2f"|format(total_pendente)|replace('.', ',') }}</h2>
+                    </div>
+                    <div class="icon-container">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card dashboard-stat-card bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Total Clientes</h6>
+                        <h2 class="display-4">{{ total_clientes }}</h2>
+                    </div>
+                    <div class="icon-container">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Segunda linha de métricas -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card dashboard-stat-card bg-info text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Total Produtos</h6>
+                        <h2 class="display-4">{{ total_produtos }}</h2>
+                    </div>
+                    <div class="icon-container">
+                        <i class="fas fa-candy-cane fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card dashboard-stat-card bg-dark text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Vendas Atrasadas</h6>
+                        <h2 class="display-4 text-danger">{{ vendas_atrasadas }}</h2>
+                    </div>
+                    <div class="icon-container">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card dashboard-stat-card bg-secondary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Lucro Estimado</h6>
+                        <h2 class="display-4 text-success">R$ {{ "%.2f"|format((total_vendas_mes - total_despesas_mes))|replace('.', ',') }}</h2>
+                    </div>
+                    <div class="icon-container">
+                        <i class="fas fa-chart-line fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card bg-dark text-white">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-area"></i> Vendas por Dia
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="graficoVendasDia"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card bg-dark text-white">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-pie"></i> Despesas por Categoria
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="graficoDespesasCategorias"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Atividades Recentes -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card bg-dark text-white">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history"></i> Vendas Recentes
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if vendas_recentes %}
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nota</th>
+                                    <th>Cliente</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for venda in vendas_recentes %}
+                                <tr>
+                                    <td>{{ venda.numero_nota }}</td>
+                                    <td>{{ venda.destinatario or 'Cliente Avulso' }}</td>
+                                    <td>R$ {{ venda.valor }}</td>
+                                    <td>
+                                        <span class="badge {% if venda.status_pagamento == 'pago' %}bg-success{% elif venda.status_pagamento == 'pendente' %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ venda.status_pagamento }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Nenhuma venda recente</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card bg-dark text-white">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-receipt"></i> Despesas Recentes
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if despesas_recentes %}
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Descrição</th>
+                                    <th>Categoria</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for despesa in despesas_recentes %}
+                                <tr>
+                                    <td>{{ despesa.descricao }}</td>
+                                    <td>{{ despesa.categoria }}</td>
+                                    <td>R$ {{ "%.2f"|format(despesa.valor)|replace('.', ',') }}</td>
+                                    <td>
+                                        <span class="badge {% if despesa.status == 'pago' %}bg-success{% elif despesa.status == 'pendente' %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ despesa.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Nenhuma despesa recente</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Dados para os gráficos
+const vendasPorDia = {{ vendas_por_dia|safe }};
+const despesasPorCategoria = {{ despesas_categoria|safe }};
+</script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

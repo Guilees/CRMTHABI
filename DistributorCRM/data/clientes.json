@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "nome": "Mercadinho São José",
+    "numero_loja": "001",
+    "endereco": "Rua das Flores, 123 - Centro",
+    "telefone": "(11) 3456-7890",
+    "email": "contato@mercadinhosaojose.com.br",
+    "observacoes": "Cliente regular, pagamento sempre em dia",
+    "data_cadastro": "2025-01-15T10:30:00"
+  },
+  {
+    "id": 2,
+    "nome": "Supermercado Central",
+    "numero_loja": "002",
+    "endereco": "Av. Principal, 456 - Comercial",
+    "telefone": "(11) 9876-5432",
+    "email": "compras@supercentral.com.br",
+    "observacoes": "Grande volume de compras, desconto especial",
+    "data_cadastro": "2025-02-10T14:15:00"
+  },
+  {
+    "id": 3,
+    "nome": "Atacadão da Doçura",
+    "numero_loja": "003",
+    "endereco": "Rua do Comércio, 789 - Industrial",
+    "telefone": "(11) 2345-6789",
+    "email": "vendas@atacadaodocura.com.br",
+    "observacoes": "Atacadista, pedidos grandes volumes",
+    "data_cadastro": "2025-03-05T09:45:00"
+  }
+]

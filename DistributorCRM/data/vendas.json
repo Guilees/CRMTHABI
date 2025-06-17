@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "numero_nota": "NFE-001",
+    "data_saida": "15/06/2025",
+    "cliente_id": 1,
+    "cliente_nome": "Mercadinho São José",
+    "destinatario": null,
+    "valor": "1250,00",
+    "forma_pagamento": "30 dias",
+    "data_vencimento": "15/07/2025",
+    "status_pagamento": "pendente",
+    "bonificacao": false,
+    "data_cadastro": "2025-06-15T10:30:00"
+  },
+  {
+    "id": 2,
+    "numero_nota": "NFE-002",
+    "data_saida": "14/06/2025",
+    "cliente_id": 2,
+    "cliente_nome": "Supermercado Central",
+    "destinatario": null,
+    "valor": "3750,50",
+    "forma_pagamento": "À vista",
+    "data_vencimento": "14/06/2025",
+    "status_pagamento": "pago",
+    "bonificacao": false,
+    "data_cadastro": "2025-06-14T14:15:00"
+  },
+  {
+    "id": 3,
+    "numero_nota": "NFE-003",
+    "data_saida": "13/06/2025",
+    "cliente_id": null,
+    "cliente_nome": null,
+    "destinatario": "Loja do João - Centro",
+    "valor": "890,75",
+    "forma_pagamento": "15 dias",
+    "data_vencimento": "28/06/2025",
+    "status_pagamento": "pendente",
+    "bonificacao": false,
+    "data_cadastro": "2025-06-13T09:45:00"
+  },
+  {
+    "id": 4,
+    "numero_nota": "NFE-004",
+    "data_saida": "12/06/2025",
+    "cliente_id": 3,
+    "cliente_nome": "Atacadão da Doçura",
+    "destinatario": null,
+    "valor": "5200,00",
+    "forma_pagamento": "45 dias",
+    "data_vencimento": "27/07/2025",
+    "status_pagamento": "pendente",
+    "bonificacao": false,
+    "data_cadastro": "2025-06-12T16:20:00"
+  },
+  {
+    "id": 5,
+    "numero_nota": "NFE-005",
+    "data_saida": "11/06/2025",
+    "cliente_id": 1,
+    "cliente_nome": "Mercadinho São José",
+    "destinatario": null,
+    "valor": "2100,25",
+    "forma_pagamento": "À vista",
+    "data_vencimento": "11/06/2025",
+    "status_pagamento": "pago",
+    "bonificacao": true,
+    "data_cadastro": "2025-06-11T11:10:00"
+  }
+]

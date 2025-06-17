@@ -1,0 +1,30 @@
+{
+  "categorias_despesas": [
+    {"nome": "Combustível"},
+    {"nome": "Manutenção"},
+    {"nome": "Salários"},
+    {"nome": "Aluguel"},
+    {"nome": "Energia"},
+    {"nome": "Telefone/Internet"},
+    {"nome": "Impostos"},
+    {"nome": "Material de Escritório"},
+    {"nome": "Marketing"},
+    {"nome": "Outros"}
+  ],
+  "app_version": "1.0.0",
+  "last_backup": null,
+  "empresa": {
+    "nome": "THABI Distribuidora",
+    "cnpj": "",
+    "endereco": "",
+    "telefone": "",
+    "email": ""
+  },
+  "configuracoes": {
+    "moeda": "BRL",
+    "timezone": "America/Sao_Paulo",
+    "formato_data": "DD/MM/YYYY",
+    "backup_automatico": true,
+    "intervalo_backup": 7
+  }
+}

@@ -1,0 +1,454 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block alert_placeholder %}
+<div id="alertPlaceholder"></div>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="display-5 fw-bold"><i class="fas fa-receipt"></i> Despesas</h1>
+        <p class="lead">Gerencie as despesas da sua distribuidora</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <button type="button" class="btn btn-primary btn-lg me-2" data-bs-toggle="modal" data-bs-target="#modalAdicionarDespesa">
+            <i class="fas fa-plus-circle"></i> Adicionar Despesa
+        </button>
+        <button type="button" class="btn btn-success btn-lg me-2" data-bs-toggle="modal" data-bs-target="#modalImportarDespesas">
+            <i class="fas fa-file-import"></i> Importar
+        </button>
+        <button type="button" class="btn btn-info btn-lg" id="btnExportarDespesas">
+            <i class="fas fa-file-export"></i> Exportar
+        </button>
+    </div>
+</div>
+
+<!-- Filtros e busca -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-search"></i> Buscar Despesas</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="dataInicio" class="form-label">Data inicial</label>
+                <input type="date" class="form-control" id="dataInicio">
+            </div>
+            <div class="col-md-3">
+                <label for="dataFim" class="form-label">Data final</label>
+                <input type="date" class="form-control" id="dataFim">
+            </div>
+            <div class="col-md-3">
+                <label for="filtroCategoria" class="form-label">Categoria</label>
+                <select class="form-select" id="filtroCategoria">
+                    <option value="">Todas as categorias</option>
+                    {% for categoria in categorias %}
+                    <option value="{{ categoria.nome }}">{{ categoria.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filtroFornecedor" class="form-label">Fornecedor</label>
+                <select class="form-select" id="filtroFornecedor">
+                    <option value="">Todos os fornecedores</option>
+                    {% for fornecedor in fornecedores %}
+                    <option value="{{ fornecedor.id }}">{{ fornecedor.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="button" id="btnBuscarDespesa" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+                <button type="button" id="btnLimparBusca" class="btn btn-secondary">
+                    <i class="fas fa-eraser"></i> Limpar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Listagem de despesas -->
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Lista de Despesas</h5>
+            <div>
+                <span class="badge bg-primary me-2" id="totalDespesas">Total: 0</span>
+                <span class="badge bg-danger" id="valorTotalDespesas">R$ 0,00</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0" id="tabelaDespesas">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                        <th>Data</th>
+                        <th>Categoria</th>
+                        <th>Fornecedor</th>
+                        <th>Status</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for despesa in despesas %}
+                    <tr data-id="{{ despesa.id }}">
+                        <td>{{ despesa.id }}</td>
+                        <td>{{ despesa.descricao }}</td>
+                        <td class="valor-moeda">{{ despesa.valor }}</td>
+                        <td>{{ despesa.data }}</td>
+                        <td>{{ despesa.categoria }}</td>
+                        <td>{{ despesa.fornecedor_nome }}</td>
+                        <td>
+                            <span class="badge {% if despesa.status == 'pago' %}bg-success{% elif despesa.status == 'pendente' %}bg-warning{% elif despesa.status == 'atrasado' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                {{ despesa.status }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-info btn-sm btn-editar" data-id="{{ despesa.id }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-success btn-sm btn-status" data-id="{{ despesa.id }}">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm btn-excluir" data-id="{{ despesa.id }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center">Nenhuma despesa registrada</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar Despesa -->
+<div class="modal fade" id="modalAdicionarDespesa" tabindex="-1" aria-labelledby="modalAdicionarDespesaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalAdicionarDespesaLabel"><i class="fas fa-plus-circle"></i> Adicionar Despesa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formAdicionarDespesa">
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="descricao" class="form-label">Descrição*</label>
+                            <input type="text" class="form-control" id="descricao" name="descricao" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="valor" class="form-label">Valor (R$)*</label>
+                            <input type="number" class="form-control" id="valor" name="valor" min="0.01" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="data" class="form-label">Data*</label>
+                            <input type="text" class="form-control" id="data" name="data" placeholder="DD/MM/AAAA" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="categoria" class="form-label">Categoria*</label>
+                            <select class="form-select" id="categoria" name="categoria" required>
+                                <option value="" selected disabled>Selecione uma categoria</option>
+                                {% for categoria in categorias %}
+                                <option value="{{ categoria.nome }}">{{ categoria.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="status" class="form-label">Status*</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="pendente">Pendente</option>
+                                <option value="pago">Pago</option>
+                                <option value="atrasado">Atrasado</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="associarFornecedor">
+                            <label class="form-check-label" for="associarFornecedor">
+                                Esta despesa está associada a um fornecedor
+                            </label>
+                        </div>
+                    </div>
+                    <div id="infoFornecedorContainer" style="display:none;">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="fornecedor_id" class="form-label">Fornecedor*</label>
+                                <select class="form-select" id="fornecedor_id" name="fornecedor_id">
+                                    <option value="" selected disabled>Selecione um fornecedor</option>
+                                    {% for fornecedor in fornecedores %}
+                                    <option value="{{ fornecedor.id }}">{{ fornecedor.nome }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="numero_nota" class="form-label">Número da Nota (opcional)</label>
+                                <input type="text" class="form-control" id="numero_nota" name="numero_nota">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="temVencimento">
+                            <label class="form-check-label" for="temVencimento">
+                                Esta despesa tem vencimento
+                            </label>
+                        </div>
+                    </div>
+                    <div id="vencimentoContainer" style="display:none;">
+                        <div class="mb-3">
+                            <label for="vencimento" class="form-label">Data de Vencimento*</label>
+                            <input type="text" class="form-control" id="vencimento" name="vencimento" placeholder="DD/MM/AAAA">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnSalvarDespesa">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Despesa -->
+<div class="modal fade" id="modalEditarDespesa" tabindex="-1" aria-labelledby="modalEditarDespesaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalEditarDespesaLabel"><i class="fas fa-edit"></i> Editar Despesa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarDespesa">
+                    <input type="hidden" id="edit_id" name="id">
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="edit_descricao" class="form-label">Descrição*</label>
+                            <input type="text" class="form-control" id="edit_descricao" name="descricao" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit_valor" class="form-label">Valor (R$)*</label>
+                            <input type="number" class="form-control" id="edit_valor" name="valor" min="0.01" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="edit_data" class="form-label">Data*</label>
+                            <input type="text" class="form-control" id="edit_data" name="data" placeholder="DD/MM/AAAA" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit_categoria" class="form-label">Categoria*</label>
+                            <select class="form-select" id="edit_categoria" name="categoria" required>
+                                <option value="" selected disabled>Selecione uma categoria</option>
+                                {% for categoria in categorias %}
+                                <option value="{{ categoria.nome }}">{{ categoria.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit_status" class="form-label">Status*</label>
+                            <select class="form-select" id="edit_status" name="status" required>
+                                <option value="pendente">Pendente</option>
+                                <option value="pago">Pago</option>
+                                <option value="atrasado">Atrasado</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="edit_associarFornecedor">
+                            <label class="form-check-label" for="edit_associarFornecedor">
+                                Esta despesa está associada a um fornecedor
+                            </label>
+                        </div>
+                    </div>
+                    <div id="edit_infoFornecedorContainer" style="display:none;">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="edit_fornecedor_id" class="form-label">Fornecedor*</label>
+                                <select class="form-select" id="edit_fornecedor_id" name="fornecedor_id">
+                                    <option value="" selected disabled>Selecione um fornecedor</option>
+                                    {% for fornecedor in fornecedores %}
+                                    <option value="{{ fornecedor.id }}">{{ fornecedor.nome }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit_numero_nota" class="form-label">Número da Nota (opcional)</label>
+                                <input type="text" class="form-control" id="edit_numero_nota" name="numero_nota">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="edit_temVencimento">
+                            <label class="form-check-label" for="edit_temVencimento">
+                                Esta despesa tem vencimento
+                            </label>
+                        </div>
+                    </div>
+                    <div id="edit_vencimentoContainer" style="display:none;">
+                        <div class="mb-3">
+                            <label for="edit_vencimento" class="form-label">Data de Vencimento*</label>
+                            <input type="text" class="form-control" id="edit_vencimento" name="vencimento" placeholder="DD/MM/AAAA">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-info" id="btnAtualizarDespesa">Atualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Atualizar Status -->
+<div class="modal fade" id="modalAtualizarStatus" tabindex="-1" aria-labelledby="modalAtualizarStatusLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalAtualizarStatusLabel"><i class="fas fa-check-circle"></i> Atualizar Status de Pagamento</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Despesa: <strong id="despesaDescricaoStatus"></strong></p>
+                <p>Valor: <strong id="despesaValorStatus"></strong></p>
+                <form id="formAtualizarStatus">
+                    <input type="hidden" id="status_id_despesa" name="id">
+                    <div class="mb-3">
+                        <label for="status_pagamento" class="form-label">Status de Pagamento*</label>
+                        <select class="form-select" id="status_pagamento" name="status" required>
+                            <option value="pendente">Pendente</option>
+                            <option value="pago">Pago</option>
+                            <option value="atrasado">Atrasado</option>
+                            <option value="cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnConfirmarAtualizarStatus">Atualizar Status</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmar Exclusão -->
+<div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-labelledby="modalConfirmarExclusaoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalConfirmarExclusaoLabel"><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir a despesa <strong id="descricaoDespesaExcluir"></strong>?</p>
+                <p class="text-danger">Esta ação não pode ser desfeita.</p>
+                <input type="hidden" id="idDespesaExcluir">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">Confirmar Exclusão</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Importar Despesas -->
+<div class="modal fade" id="modalImportarDespesas" tabindex="-1" aria-labelledby="modalImportarDespesasLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalImportarDespesasLabel"><i class="fas fa-upload"></i> Importar Despesas</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formImportarDespesas" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="arquivo_importacao" class="form-label">Selecione o Arquivo Excel</label>
+                        <input type="file" class="form-control" id="arquivo_importacao" name="arquivo" accept=".xlsx, .xls" required>
+                    </div>
+                    <div class="mb-3">
+                        <div class="alert alert-info">
+                            <p><i class="fas fa-info-circle"></i> Instruções:</p>
+                            <ol>
+                                <li>O arquivo deve estar no formato Excel (.xlsx ou .xls)</li>
+                                <li>A planilha deve conter as seguintes colunas: Descrição, Valor, Data, Categoria, Fornecedor, Número da Nota, Vencimento, Status</li>
+                                <li>Os valores monetários devem estar no formato brasileiro (ex: 1.500,25)</li>
+                                <li>As datas devem estar no formato DD/MM/AAAA</li>
+                            </ol>
+                            <p>
+                                <a href="/api/despesas/modelo_importacao" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-download"></i> Baixar Modelo
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnConfirmarImportarDespesas">Importar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Selecionar Ano para Exportação -->
+<div class="modal fade" id="modalSelecionarAnoExportacao" tabindex="-1" aria-labelledby="modalSelecionarAnoExportacaoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalSelecionarAnoExportacaoLabel"><i class="fas fa-calendar-alt"></i> Selecionar Ano para Exportação</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formSelecionarAnoExportacao">
+                    <div class="mb-3">
+                        <label for="ano_exportacao" class="form-label">Selecione o Ano</label>
+                        <select class="form-select" id="ano_exportacao" name="ano">
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+                            <option value="2025" selected>2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-info" id="btnConfirmarExportacaoDespesas">Exportar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/despesas.js') }}"></script>
+{% endblock %}

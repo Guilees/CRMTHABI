@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-5 fw-bold"><i class="fas fa-file-alt"></i> Relatórios</h1>
+        <p class="lead">Gere relatórios detalhados para análise do seu negócio</p>
+    </div>
+</div>
+
+<!-- Seleção de relatório -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-cogs"></i> Configurar Relatório</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label for="tipoRelatorio" class="form-label">Tipo de Relatório*</label>
+                <select class="form-select" id="tipoRelatorio" required>
+                    <option value="" selected disabled>Selecione um tipo</option>
+                    <option value="vendas">Relatório de Vendas</option>
+                    <option value="produtos">Relatório de Produtos e Margens</option>
+                    <option value="despesas">Relatório de Despesas</option>
+                    <option value="clientes">Relatório de Clientes</option>
+                    <option value="lucro">Relatório de Lucro</option>
+                </select>
+            </div>
+            
+            <div class="col-md-4 periodo-container">
+                <label for="dataInicio" class="form-label">Data Inicial*</label>
+                <input type="date" class="form-control" id="dataInicio">
+            </div>
+            
+            <div class="col-md-4 periodo-container">
+                <label for="dataFim" class="form-label">Data Final*</label>
+                <input type="date" class="form-control" id="dataFim">
+            </div>
+            
+            <div class="col-12">
+                <button type="button" id="btnGerarRelatorio" class="btn btn-primary btn-lg mt-2">
+                    <i class="fas fa-chart-bar"></i> Gerar Relatório
+                </button>
+                <button type="button" id="btnExportarExcel" class="btn btn-success btn-lg mt-2">
+                    <i class="fas fa-file-excel"></i> Exportar para Excel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resultado do relatório -->
+<div id="resultadoRelatorio" class="card mb-4" style="display:none;">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="fas fa-chart-line"></i> <span id="tituloRelatorio">Resultado do Relatório</span></h5>
+    </div>
+    <div class="card-body">
+        <!-- Relatório de Vendas -->
+        <div id="relatorioVendas" style="display:none;">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Resumo de Vendas</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h2 class="display-6" id="totalVendas">0</h2>
+                                    <p>Vendas realizadas</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h2 class="display-6" id="valorTotalVendas">R$ 0,00</h2>
+                                    <p>Valor total</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-dark text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Gráfico de Vendas</h5>
+                            <canvas id="graficoVendas" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Vendas por Forma de Pagamento</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="tabelaFormasPagamento">
+                                    <thead>
+                                        <tr>
+                                            <th>Forma de Pagamento</th>
+                                            <th>Quantidade</th>
+                                            <th>Valor Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Preenchido via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Vendas por Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="tabelaStatusVendas">
+                                    <thead>
+                                        <tr>
+                                            <th>Status</th>
+                                            <th>Quantidade</th>
+                                            <th>Valor Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Preenchido via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Top Clientes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="tabelaTopClientes">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Quantidade de Vendas</th>
+                                    <th>Valor Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Preenchido via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Relatório de Produtos -->
+        <div id="relatorioProdutos" style="display:none;">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Resumo de Produtos</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h2 class="display-6" id="totalProdutos">0</h2>
+                                    <p>Produtos cadastrados</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h2 class="display-6" id="mediaMargem">0%</h2>
+                                    <p>Margem média de lucro</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Top 10 Produtos por Margem de Lucro</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="tabelaTopProdutos">
+                                    <thead>
+                                        <tr>
+                                            <th>Produto</th>
+                                            <th>Valor de Compra</th>
+                                            <th>Valor de Venda</th>
+                                            <th>Margem</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Preenchido via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-5">
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Produtos por Fornecedor</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="graficoProdutosFornecedor" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Relatório de Despesas -->
+        <div id="relatorioDespesas" style="display:none;">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card bg-danger text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Resumo de Despesas</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h2 class="display-6" id="totalDespesas">0</h2>
+                                    <p>Despesas registradas</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h2 class="display-6" id="valorTotalDespesas">R$ 0,00</h2>
+                                    <p>Valor total</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-dark text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Gráfico de Despesas por Categoria</h5>
+                            <canvas id="graficoDespesasCategorias" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Despesas por Categoria</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="tabelaCategoriasDespesas">
+                            <thead>
+                                <tr>
+                                    <th>Categoria</th>
+                                    <th>Quantidade</th>
+                                    <th>Valor Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Preenchido via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Relatório de Lucro -->
+        <div id="relatorioLucro" style="display:none;">
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card bg-success text-white">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Receita Total</h5>
+                            <h2 class="display-6" id="receitaTotal">R$ 0,00</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-danger text-white">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Despesas Total</h5>
+                            <h2 class="display-6" id="despesasTotal">R$ 0,00</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Lucro Líquido</h5>
+                            <h2 class="display-6" id="lucroLiquido">R$ 0,00</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Evolução do Lucro</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoLucro" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading -->
+<div id="loadingRelatorio" class="text-center" style="display:none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Carregando...</span>
+    </div>
+    <p class="mt-2">Gerando relatório...</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/relatorios.js') }}"></script>
+{% endblock %}

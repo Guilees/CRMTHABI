@@ -1,0 +1,58 @@
+[
+    {
+        "id": 1,
+        "nome": "Matéria-prima"
+    },
+    {
+        "id": 2,
+        "nome": "Embalagens"
+    },
+    {
+        "id": 3,
+        "nome": "Transporte"
+    },
+    {
+        "id": 4,
+        "nome": "Combustível"
+    },
+    {
+        "id": 5,
+        "nome": "Manutenção"
+    },
+    {
+        "id": 6,
+        "nome": "Aluguel"
+    },
+    {
+        "id": 7,
+        "nome": "Água"
+    },
+    {
+        "id": 8,
+        "nome": "Energia"
+    },
+    {
+        "id": 9,
+        "nome": "Internet"
+    },
+    {
+        "id": 10,
+        "nome": "Telefone"
+    },
+    {
+        "id": 11,
+        "nome": "Folha de pagamento"
+    },
+    {
+        "id": 12,
+        "nome": "Impostos"
+    },
+    {
+        "id": 13,
+        "nome": "Marketing"
+    },
+    {
+        "id": 14,
+        "nome": "Outras despesas"
+    }
+]

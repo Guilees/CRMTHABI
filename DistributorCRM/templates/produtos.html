@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="display-5 fw-bold"><i class="fas fa-candy-cane"></i> Produtos</h1>
+        <p class="lead">Gerencie os produtos da sua distribuidora</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalAdicionarProduto">
+            <i class="fas fa-plus-circle"></i> Adicionar Produto
+        </button>
+    </div>
+</div>
+
+<!-- Filtros e busca -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-search"></i> Buscar Produtos</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="termoBusca" class="form-label">Termo de busca</label>
+                <input type="text" class="form-control" id="termoBusca" placeholder="Nome do produto">
+            </div>
+            <div class="col-md-6">
+                <label for="filtroFornecedor" class="form-label">Filtrar por fornecedor</label>
+                <select class="form-select" id="filtroFornecedor">
+                    <option value="">Todos os fornecedores</option>
+                    {% for fornecedor in fornecedores %}
+                    <option value="{{ fornecedor.id }}">{{ fornecedor.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="button" id="btnBuscarProduto" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+                <button type="button" id="btnLimparBusca" class="btn btn-secondary">
+                    <i class="fas fa-eraser"></i> Limpar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Listagem de produtos -->
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="fas fa-list"></i> Lista de Produtos</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0" id="tabelaProdutos">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Valor de Compra</th>
+                        <th>Valor de Venda</th>
+                        <th>Margem</th>
+                        <th>Fornecedor</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for produto in produtos %}
+                    <tr data-id="{{ produto.id }}">
+                        <td>{{ produto.id }}</td>
+                        <td>{{ produto.nome }}</td>
+                        <td>R$ {{ "%.2f"|format(produto.valor_compra)|replace('.', ',') }}</td>
+                        <td>R$ {{ "%.2f"|format(produto.valor_venda)|replace('.', ',') }}</td>
+                        <td>
+                            <span class="badge {% if produto.margem_lucro > 30 %}bg-success{% elif produto.margem_lucro > 15 %}bg-info{% else %}bg-warning{% endif %}">
+                                {{ produto.margem_lucro }}%
+                            </span>
+                        </td>
+                        <td>{{ produto.fornecedor_nome }}</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-info btn-sm btn-editar" 
+                                    data-id="{{ produto.id }}"
+                                    data-nome="{{ produto.nome }}"
+                                    data-valor_compra="{{ produto.valor_compra }}"
+                                    data-valor_venda="{{ produto.valor_venda }}"
+                                    data-id_fornecedor="{{ produto.id_fornecedor }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm btn-excluir" 
+                                    data-id="{{ produto.id }}"
+                                    data-nome="{{ produto.nome }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">Nenhum produto cadastrado</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar Produto -->
+<div class="modal fade" id="modalAdicionarProduto" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-plus-circle"></i> Adicionar Produto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('adicionar_produto') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome do Produto*</label>
+                        <input type="text" class="form-control" id="nome" name="nome" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="valor_compra" class="form-label">Valor de Compra (R$)*</label>
+                            <input type="number" class="form-control" id="valor_compra" name="valor_compra" min="0.01" step="0.01" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="valor_venda" class="form-label">Valor de Venda (R$)*</label>
+                            <input type="number" class="form-control" id="valor_venda" name="valor_venda" min="0.01" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_fornecedor" class="form-label">Fornecedor*</label>
+                        <select class="form-select" id="id_fornecedor" name="id_fornecedor" required>
+                            <option value="" selected disabled>Selecione um fornecedor</option>
+                            {% for fornecedor in fornecedores %}
+                            <option value="{{ fornecedor.id }}">{{ fornecedor.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="preview_margem" class="form-label">Prévia da Margem de Lucro:</label>
+                        <div class="progress">
+                            <div class="progress-bar" id="preview_margem_bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Produto -->
+<div class="modal fade" id="modalEditarProduto" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="fas fa-edit"></i> Editar Produto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditarProduto" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit_nome" class="form-label">Nome do Produto*</label>
+                        <input type="text" class="form-control" id="edit_nome" name="nome" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="edit_valor_compra" class="form-label">Valor de Compra (R$)*</label>
+                            <input type="number" class="form-control" id="edit_valor_compra" name="valor_compra" min="0.01" step="0.01" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_valor_venda" class="form-label">Valor de Venda (R$)*</label>
+                            <input type="number" class="form-control" id="edit_valor_venda" name="valor_venda" min="0.01" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_id_fornecedor" class="form-label">Fornecedor*</label>
+                        <select class="form-select" id="edit_id_fornecedor" name="id_fornecedor" required>
+                            <option value="" selected disabled>Selecione um fornecedor</option>
+                            {% for fornecedor in fornecedores %}
+                            <option value="{{ fornecedor.id }}">{{ fornecedor.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_preview_margem" class="form-label">Prévia da Margem de Lucro:</label>
+                        <div class="progress">
+                            <div class="progress-bar" id="edit_preview_margem_bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-info">Atualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmar Exclusão -->
+<div class="modal fade" id="modalConfirmarExclusao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o produto <strong id="nomeProdutoExcluir"></strong>?</p>
+                <p class="text-danger">Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">Confirmar Exclusão</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/produtos.js') }}"></script>
+{% endblock %}

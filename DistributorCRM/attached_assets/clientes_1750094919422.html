@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="display-5 fw-bold"><i class="fas fa-users"></i> Clientes</h1>
+        <p class="lead">Gerencie os clientes da sua distribuidora</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalAdicionarCliente">
+            <i class="fas fa-plus-circle"></i> Adicionar Cliente
+        </button>
+    </div>
+</div>
+
+<!-- Filtros e busca -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-search"></i> Buscar Clientes</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-8">
+                <label for="termoBusca" class="form-label">Termo de busca</label>
+                <input type="text" class="form-control" id="termoBusca" placeholder="Nome, CNPJ ou número da loja">
+            </div>
+            <div class="col-md-4">
+                <label for="filtroGrupo" class="form-label">Filtrar por grupo</label>
+                <select class="form-select" id="filtroGrupo">
+                    <option value="">Todos os grupos</option>
+                    <option value="Rede 1">Rede 1</option>
+                    <option value="Rede 2">Rede 2</option>
+                    <option value="Autônomo">Autônomo</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="button" id="btnBuscarCliente" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+                <button type="button" id="btnLimparBusca" class="btn btn-secondary">
+                    <i class="fas fa-eraser"></i> Limpar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Listagem de clientes -->
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="fas fa-list"></i> Lista de Clientes</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0" id="tabelaClientes">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Número</th>
+                        <th>CNPJ</th>
+                        <th>Grupo</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes %}
+                    <tr data-id="{{ cliente.id }}">
+                        <td>{{ cliente.id }}</td>
+                        <td>{{ cliente.nome }}</td>
+                        <td>{{ cliente.numero_loja }}</td>
+                        <td class="cnpj-mask">{{ cliente.cnpj }}</td>
+                        <td>{{ cliente.grupo if cliente.grupo else "N/A" }}</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-info btn-sm btn-editar" data-id="{{ cliente.id }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm btn-excluir" data-id="{{ cliente.id }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">Nenhum cliente cadastrado</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar Cliente -->
+<div class="modal fade" id="modalAdicionarCliente" tabindex="-1" aria-labelledby="modalAdicionarClienteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalAdicionarClienteLabel"><i class="fas fa-plus-circle"></i> Adicionar Cliente</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formAdicionarCliente">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="nome" class="form-label">Nome do Cliente*</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="numero_loja" class="form-label">Número da Loja*</label>
+                            <input type="text" class="form-control" id="numero_loja" name="numero_loja" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="cnpj" class="form-label">CNPJ*</label>
+                            <input type="text" class="form-control" id="cnpj" name="cnpj" placeholder="XX.XXX.XXX/XXXX-XX" required>
+                            <div class="form-text">Digite apenas números ou no formato XX.XXX.XXX/XXXX-XX</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="grupo" class="form-label">Grupo</label>
+                            <input type="text" class="form-control" id="grupo" name="grupo" placeholder="Ex: Rede de Supermercados">
+                            <div class="form-text">Deixe em branco se não pertencer a nenhum grupo</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnSalvarCliente">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Cliente -->
+<div class="modal fade" id="modalEditarCliente" tabindex="-1" aria-labelledby="modalEditarClienteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalEditarClienteLabel"><i class="fas fa-edit"></i> Editar Cliente</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarCliente">
+                    <input type="hidden" id="edit_id" name="id">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="edit_nome" class="form-label">Nome do Cliente*</label>
+                            <input type="text" class="form-control" id="edit_nome" name="nome" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_numero_loja" class="form-label">Número da Loja*</label>
+                            <input type="text" class="form-control" id="edit_numero_loja" name="numero_loja" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="edit_cnpj" class="form-label">CNPJ*</label>
+                            <input type="text" class="form-control" id="edit_cnpj" name="cnpj" placeholder="XX.XXX.XXX/XXXX-XX" required>
+                            <div class="form-text">Digite apenas números ou no formato XX.XXX.XXX/XXXX-XX</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_grupo" class="form-label">Grupo</label>
+                            <input type="text" class="form-control" id="edit_grupo" name="grupo" placeholder="Ex: Rede de Supermercados">
+                            <div class="form-text">Deixe em branco se não pertencer a nenhum grupo</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-info" id="btnAtualizarCliente">Atualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmar Exclusão -->
+<div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-labelledby="modalConfirmarExclusaoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalConfirmarExclusaoLabel"><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o cliente <strong id="nomeClienteExcluir"></strong>?</p>
+                <p class="text-danger">Esta ação não pode ser desfeita.</p>
+                <input type="hidden" id="idClienteExcluir">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">Confirmar Exclusão</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/clientes.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-5 fw-bold"><i class="fas fa-calculator"></i> Calculadora de Margens</h1>
+        <p class="lead">Ferramenta para cálculo de margens de lucro e precificação</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Calculadora Principal -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-calculator"></i> Calcular Margem</h5>
+            </div>
+            <div class="card-body">
+                <form id="formCalculadora">
+                    <div class="mb-3">
+                        <label for="valorCompra" class="form-label">Valor de Compra (R$)*</label>
+                        <input type="number" class="form-control form-control-lg" id="valorCompra" 
+                               placeholder="0,00" min="0.01" step="0.01" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="valorVenda" class="form-label">Valor de Venda (R$)*</label>
+                        <input type="number" class="form-control form-control-lg" id="valorVenda" 
+                               placeholder="0,00" min="0.01" step="0.01" required>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary btn-lg" id="btnCalcular">
+                            <i class="fas fa-calculator"></i> Calcular
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="btnLimpar">
+                            <i class="fas fa-eraser"></i> Limpar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Calculadora Reversa -->
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-percentage"></i> Calcular por Margem Desejada</h5>
+            </div>
+            <div class="card-body">
+                <form id="formCalculadoraReversa">
+                    <div class="mb-3">
+                        <label for="valorCompraRev" class="form-label">Valor de Compra (R$)*</label>
+                        <input type="number" class="form-control" id="valorCompraRev" 
+                               placeholder="0,00" min="0.01" step="0.01" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="margemDesejada" class="form-label">Margem Desejada (%)*</label>
+                        <input type="number" class="form-control" id="margemDesejada" 
+                               placeholder="30" min="0" step="0.1" required>
+                    </div>
+                    
+                    <button type="button" class="btn btn-success" id="btnCalcularReverso">
+                        <i class="fas fa-percentage"></i> Calcular Preço de Venda
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Resultados -->
+    <div class="col-md-6">
+        <!-- Resultado Principal -->
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> Resultados</h5>
+            </div>
+            <div class="card-body">
+                <div id="resultados" style="display:none;">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <h6>Valor de Compra:</h6>
+                            <h4 class="text-danger" id="resultCompra">R$ 0,00</h4>
+                        </div>
+                        <div class="col-6">
+                            <h6>Valor de Venda:</h6>
+                            <h4 class="text-success" id="resultVenda">R$ 0,00</h4>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <h6>Lucro por Unidade:</h6>
+                            <h4 class="text-primary" id="resultLucro">R$ 0,00</h4>
+                        </div>
+                        <div class="col-6">
+                            <h6>Margem de Lucro:</h6>
+                            <h4 class="text-warning" id="resultMargem">0%</h4>
+                        </div>
+                    </div>
+                    
+                    <!-- Barra de Progresso da Margem -->
+                    <div class="mb-3">
+                        <label class="form-label">Visualização da Margem:</label>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar" id="barraProgresso" role="progressbar" 
+                                 style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                0%
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            <span class="badge bg-danger">0-15%</span>
+                            <span class="badge bg-warning">15-30%</span>
+                            <span class="badge bg-success">30%+</span>
+                        </small>
+                    </div>
+                    
+                    <!-- Análise -->
+                    <div class="alert" id="analiseResultado" role="alert">
+                        <strong>Análise:</strong> <span id="textoAnalise"></span>
+                    </div>
+                </div>
+                
+                <div id="semResultados" class="text-center text-muted">
+                    <i class="fas fa-calculator fa-3x mb-3"></i>
+                    <p>Digite os valores e clique em "Calcular" para ver os resultados</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Simulador de Quantidade -->
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-boxes"></i> Simulador de Quantidade</h5>
+            </div>
+            <div class="card-body">
+                <div id="simuladorQuantidade" style="display:none;">
+                    <div class="mb-3">
+                        <label for="quantidade" class="form-label">Quantidade a vender:</label>
+                        <input type="number" class="form-control" id="quantidade" value="1" min="1">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <h6>Investimento Total:</h6>
+                            <h5 class="text-danger" id="investimentoTotal">R$ 0,00</h5>
+                        </div>
+                        <div class="col-6">
+                            <h6>Lucro Total:</h6>
+                            <h5 class="text-success" id="lucroTotal">R$ 0,00</h5>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="semSimulacao" class="text-center text-muted">
+                    <i class="fas fa-boxes fa-2x mb-2"></i>
+                    <p>Faça um cálculo primeiro para usar o simulador</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Histórico de Cálculos -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Histórico de Cálculos</h5>
+                    <button type="button" class="btn btn-sm btn-outline-light" id="btnLimparHistorico">
+                        <i class="fas fa-trash"></i> Limpar Histórico
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tabelaHistorico">
+                        <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Valor Compra</th>
+                                <th>Valor Venda</th>
+                                <th>Lucro</th>
+                                <th>Margem</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Preenchido via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="historicoVazio" class="text-center text-muted">
+                    <i class="fas fa-history fa-3x mb-3"></i>
+                    <p>Nenhum cálculo realizado ainda</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dicas e Ajuda -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-lightbulb"></i> Dicas de Precificação</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="alert alert-success">
+                            <strong><i class="fas fa-check-circle"></i> Margem Boa (30%+)</strong>
+                            <p class="mb-0">Produto com boa rentabilidade. Considere estratégias de volume.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="alert alert-warning">
+                            <strong><i class="fas fa-exclamation-triangle"></i> Margem Média (15-30%)</strong>
+                            <p class="mb-0">Margem aceitável. Monitore custos e oportunidades de melhoria.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="alert alert-danger">
+                            <strong><i class="fas fa-times-circle"></i> Margem Baixa (0-15%)</strong>
+                            <p class="mb-0">Margem muito baixa. Revise custos ou ajuste preços.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h6><i class="fas fa-info-circle"></i> Como usar:</h6>
+                <ul class="mb-0">
+                    <li><strong>Calcular Margem:</strong> Digite o valor de compra e venda para ver a margem de lucro</li>
+                    <li><strong>Calcular por Margem:</strong> Digite o valor de compra e a margem desejada para obter o preço de venda</li>
+                    <li><strong>Simulador:</strong> Use para calcular lucros em diferentes quantidades</li>
+                    <li><strong>Histórico:</strong> Acompanhe seus cálculos anteriores</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/calculadora.js') }}"></script>
+{% endblock %}

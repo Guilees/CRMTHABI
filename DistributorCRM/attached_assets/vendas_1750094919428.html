@@ -1,0 +1,485 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="display-5 fw-bold"><i class="fas fa-shopping-cart"></i> Vendas</h1>
+        <p class="lead">Gerencie as vendas da sua distribuidora</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalAdicionarVenda">
+            <i class="fas fa-plus-circle"></i> Registrar Venda
+        </button>
+        <div class="btn-group ms-2">
+            <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-file-excel"></i> Excel
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#" id="btnExportarVendas"><i class="fas fa-download"></i> Exportar Vendas</a></li>
+                <li><a class="dropdown-item" href="#" id="btnExportarVendasPorAno"><i class="fas fa-calendar-alt"></i> Vendas por Ano (VENDAS_2025)</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" id="btnGerarModeloImportacao"><i class="fas fa-file-download"></i> Gerar Modelo</a></li>
+                <li><a class="dropdown-item" href="#" id="btnImportarVendas"><i class="fas fa-upload"></i> Importar Vendas</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros e busca -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-search"></i> Buscar Vendas</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="dataInicio" class="form-label">Data inicial</label>
+                <input type="date" class="form-control" id="dataInicio">
+            </div>
+            <div class="col-md-3">
+                <label for="dataFim" class="form-label">Data final</label>
+                <input type="date" class="form-control" id="dataFim">
+            </div>
+            <div class="col-md-3">
+                <label for="filtroCliente" class="form-label">Cliente</label>
+                <select class="form-select" id="filtroCliente">
+                    <option value="">Todos os clientes</option>
+                    {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filtroStatus" class="form-label">Status de pagamento</label>
+                <select class="form-select" id="filtroStatus">
+                    <option value="">Todos os status</option>
+                    <option value="pendente">Pendente</option>
+                    <option value="pago">Pago</option>
+                    <option value="atrasado">Atrasado</option>
+                    <option value="cancelado">Cancelado</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="filtroBonificacao">
+                    <label class="form-check-label" for="filtroBonificacao">
+                        Apenas Bonificações
+                    </label>
+                </div>
+            </div>
+            <div class="col-12">
+                <button type="button" id="btnBuscarVenda" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+                <button type="button" id="btnLimparBusca" class="btn btn-secondary">
+                    <i class="fas fa-eraser"></i> Limpar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Listagem de vendas -->
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Lista de Vendas</h5>
+            <div>
+                <span class="badge bg-primary me-2" id="totalVendas">Total: 0</span>
+                <span class="badge bg-success" id="valorTotalVendas">R$ 0,00</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0 bg-dark">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0 text-white bg-dark" id="tabelaVendas">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nota</th>
+                        <th>Data</th>
+                        <th>Cliente</th>
+                        <th>Valor</th>
+                        <th>Pagamento</th>
+                        <th>Status</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venda in vendas %}
+                    <tr data-id="{{ venda.id }}">
+                        <td>{{ venda.id }}</td>
+                        <td>{{ venda.numero_nota }}</td>
+                        <td>{{ venda.data_saida }}</td>
+                        <td>{{ venda.cliente_nome }}</td>
+                        <td class="valor-moeda">{{ venda.valor }}</td>
+                        <td>{{ venda.forma_pagamento }}</td>
+                        <td>
+                            <span class="badge {% if venda.status_pagamento == 'pago' %}bg-success{% elif venda.status_pagamento == 'pendente' %}bg-warning{% elif venda.status_pagamento == 'atrasado' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                {{ venda.status_pagamento }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-info btn-sm btn-editar" data-id="{{ venda.id }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-success btn-sm btn-status" data-id="{{ venda.id }}">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm btn-excluir" data-id="{{ venda.id }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center">Nenhuma venda registrada</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar Venda -->
+<div class="modal fade" id="modalAdicionarVenda" tabindex="-1" aria-labelledby="modalAdicionarVendaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalAdicionarVendaLabel"><i class="fas fa-plus-circle"></i> Registrar Venda</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formAdicionarVenda">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="numero_nota" class="form-label">Número da Nota</label>
+                            <input type="text" class="form-control" id="numero_nota" name="numero_nota">
+                            <small class="text-muted">Não é obrigatório, será gerado automaticamente se vazio</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="data_saida" class="form-label">Data de Saída*</label>
+                            <input type="text" class="form-control" id="data_saida" name="data_saida" placeholder="DD/MM/AAAA" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="cliente_id" class="form-label">Cliente*</label>
+                            <select class="form-select" id="cliente_id" name="cliente_id">
+                                <option value="">Cliente Avulso</option>
+                                {% for cliente in clientes %}
+                                <option value="{{ cliente.id }}" data-numero="{{ cliente.numero_loja }}">{{ cliente.nome }} - Loja {{ cliente.numero_loja }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="destinatarioAvulsoContainer">
+                            <label for="destinatario" class="form-label">Nome do Cliente Avulso/Personalizado*</label>
+                            <input type="text" class="form-control" id="destinatario" name="destinatario" placeholder="Digite o nome do cliente aqui">
+                        </div>
+                    </div>
+                    <div class="row mb-3" id="infoClienteContainer" style="display:none;">
+                        <div class="col-md-12">
+                            <div class="alert alert-info">
+                                <strong>Cliente selecionado:</strong> <span id="infoClienteNome"></span> | 
+                                <strong>Loja:</strong> <span id="infoClienteNumero"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="valor" class="form-label">Valor Total (R$)*</label>
+                            <input type="text" class="form-control" id="valor" name="valor" placeholder="Ex: 15.590,00" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="forma_pagamento" class="form-label">Forma de Pagamento*</label>
+                            <select class="form-select" id="forma_pagamento" name="forma_pagamento" required>
+                                <option value="à vista">À Vista</option>
+                                <option value="pix">PIX</option>
+                                <option value="boleto">Boleto</option>
+                                <option value="cheque">Cheque</option>
+                                <option value="cartão">Cartão</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="data_vencimento" class="form-label">Data de Vencimento*</label>
+                            <input type="text" class="form-control" id="data_vencimento" name="data_vencimento" placeholder="DD/MM/AAAA" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="status_pagamento" class="form-label">Status de Pagamento*</label>
+                            <select class="form-select" id="status_pagamento" name="status_pagamento" required>
+                                <option value="pendente" selected>Pendente</option>
+                                <option value="pago">Pago</option>
+                                <option value="atrasado">Atrasado</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="bonificacao" name="bonificacao">
+                                <label class="form-check-label" for="bonificacao">
+                                    <strong>Bonificação</strong> (Entrega sem custo para o cliente)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Seção de Produtos da Venda removida conforme solicitação -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnSalvarVenda">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar Produto à Venda -->
+<div class="modal fade" id="modalAdicionarProdutoVenda" tabindex="-1" aria-labelledby="modalAdicionarProdutoVendaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalAdicionarProdutoVendaLabel"><i class="fas fa-plus"></i> Adicionar Produto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formAdicionarProdutoVenda">
+                    <div class="mb-3">
+                        <label for="id_produto" class="form-label">Produto*</label>
+                        <select class="form-select" id="id_produto" name="id_produto" required>
+                            <option value="" selected disabled>Selecione um produto</option>
+                            {% for produto in produtos %}
+                            <option value="{{ produto.id }}" data-valor="{{ produto.valor_venda }}">{{ produto.nome }} - R$ {{ "%.2f"|format(produto.valor_venda) }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="quantidade" class="form-label">Quantidade*</label>
+                            <input type="number" class="form-control" id="quantidade" name="quantidade" min="1" value="1" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="valor_unitario" class="form-label">Valor Unitário*</label>
+                            <input type="number" class="form-control" id="valor_unitario" name="valor_unitario" min="0.01" step="0.01" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="valor_total_produto" class="form-label">Valor Total</label>
+                            <input type="number" class="form-control" id="valor_total_produto" name="valor_total_produto" readonly>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnConfirmarAdicionarProduto">Adicionar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Venda -->
+<div class="modal fade" id="modalEditarVenda" tabindex="-1" aria-labelledby="modalEditarVendaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalEditarVendaLabel"><i class="fas fa-edit"></i> Editar Venda</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarVenda">
+                    <input type="hidden" id="edit_id" name="id">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="edit_numero_nota" class="form-label">Número da Nota</label>
+                            <input type="text" class="form-control" id="edit_numero_nota" name="numero_nota">
+                            <small class="text-muted">Não é obrigatório, será gerado automaticamente se vazio</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_data_saida" class="form-label">Data de Saída*</label>
+                            <input type="text" class="form-control" id="edit_data_saida" name="data_saida" placeholder="DD/MM/AAAA" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="edit_cliente_id" class="form-label">Cliente*</label>
+                            <select class="form-select" id="edit_cliente_id" name="cliente_id">
+                                <option value="">Cliente Avulso</option>
+                                {% for cliente in clientes %}
+                                <option value="{{ cliente.id }}" data-numero="{{ cliente.numero_loja }}">{{ cliente.nome }} - Loja {{ cliente.numero_loja }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="edit_destinatarioAvulsoContainer">
+                            <label for="edit_destinatario" class="form-label">Nome do Cliente Avulso/Personalizado*</label>
+                            <input type="text" class="form-control" id="edit_destinatario" name="destinatario" placeholder="Digite o nome do cliente aqui">
+                        </div>
+                    </div>
+                    <div class="row mb-3" id="edit_infoClienteContainer" style="display:none;">
+                        <div class="col-md-12">
+                            <div class="alert alert-info">
+                                <strong>Cliente selecionado:</strong> <span id="edit_infoClienteNome"></span> | 
+                                <strong>Loja:</strong> <span id="edit_infoClienteNumero"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="edit_valor" class="form-label">Valor Total (R$)*</label>
+                            <input type="text" class="form-control" id="edit_valor" name="valor" placeholder="Ex: 15.590,85" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit_forma_pagamento" class="form-label">Forma de Pagamento*</label>
+                            <select class="form-select" id="edit_forma_pagamento" name="forma_pagamento" required>
+                                <option value="à vista">À Vista</option>
+                                <option value="pix">PIX</option>
+                                <option value="boleto">Boleto</option>
+                                <option value="cheque">Cheque</option>
+                                <option value="cartão">Cartão</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit_data_vencimento" class="form-label">Data de Vencimento*</label>
+                            <input type="text" class="form-control" id="edit_data_vencimento" name="data_vencimento" placeholder="DD/MM/AAAA" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="edit_status_pagamento" class="form-label">Status de Pagamento*</label>
+                            <select class="form-select" id="edit_status_pagamento" name="status_pagamento" required>
+                                <option value="pendente">Pendente</option>
+                                <option value="pago">Pago</option>
+                                <option value="atrasado">Atrasado</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="edit_bonificacao" name="bonificacao">
+                                <label class="form-check-label" for="edit_bonificacao">
+                                    <strong>Bonificação</strong> (Entrega sem custo para o cliente)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-info" id="btnAtualizarVenda">Atualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Atualizar Status -->
+<div class="modal fade" id="modalAtualizarStatus" tabindex="-1" aria-labelledby="modalAtualizarStatusLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalAtualizarStatusLabel"><i class="fas fa-check-circle"></i> Atualizar Status de Pagamento</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Venda: <strong id="vendaNumeroStatus"></strong></p>
+                <p>Cliente: <strong id="vendaClienteStatus"></strong></p>
+                <p>Valor: <strong id="vendaValorStatus"></strong></p>
+                <form id="formAtualizarStatus">
+                    <input type="hidden" id="status_id_venda" name="id">
+                    <div class="mb-3">
+                        <label for="status_pagamento" class="form-label">Status de Pagamento*</label>
+                        <select class="form-select" id="status_pagamento" name="status_pagamento" required>
+                            <option value="pendente">Pendente</option>
+                            <option value="pago">Pago</option>
+                            <option value="atrasado">Atrasado</option>
+                            <option value="cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnConfirmarAtualizarStatus">Atualizar Status</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmar Exclusão -->
+<div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-labelledby="modalConfirmarExclusaoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalConfirmarExclusaoLabel"><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir a venda <strong id="numeroVendaExcluir"></strong>?</p>
+                <p class="text-danger">Esta ação não pode ser desfeita.</p>
+                <input type="hidden" id="idVendaExcluir">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">Confirmar Exclusão</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Importar Vendas -->
+<div class="modal fade" id="modalImportarVendas" tabindex="-1" aria-labelledby="modalImportarVendasLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalImportarVendasLabel"><i class="fas fa-upload"></i> Importar Vendas</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formImportarVendas" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="arquivo_importacao" class="form-label">Selecione o Arquivo Excel</label>
+                        <input type="file" class="form-control" id="arquivo_importacao" name="arquivo" accept=".xlsx,.xls" required>
+                        <div class="form-text">
+                            Formatos aceitos: .xlsx, .xls
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="alert alert-info">
+                            <p class="mb-1"><i class="fas fa-info-circle"></i> <strong>Instruções:</strong></p>
+                            <ul class="mb-0 ps-4">
+                                <li>Utilize o modelo fornecido pelo botão "Gerar Modelo"</li>
+                                <li>Formato da data: DD/MM/AAAA</li>
+                                <li>Valor no formato: R$ 1.234,56</li>
+                                <li>Formas de pagamento: pix, boleto, cheque, cartão, à vista</li>
+                                <li>Status: pendente, pago, atrasado, cancelado</li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+                <div id="resultadoImportacao" style="display: none;" class="alert alert-success">
+                    <p class="mb-1"><strong>Importação concluída:</strong></p>
+                    <p id="resumoImportacao" class="mb-0"></p>
+                </div>
+                <div id="errosImportacao" style="display: none;">
+                    <p class="text-danger"><strong>Erros encontrados:</strong></p>
+                    <ul id="listaErrosImportacao" class="text-danger"></ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnGerarModelo">Gerar Modelo</button>
+                <button type="button" class="btn btn-primary" id="btnEnviarImportacao">Importar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/vendas.js') }}"></script>
+{% endblock %}

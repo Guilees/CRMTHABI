@@ -1,0 +1,569 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h1 class="mb-4">Calculadora de Margens</h1>
+    
+    <div class="row">
+        <!-- Calculadora de Margem -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="my-0">Calcular Margem de Lucro</h5>
+                </div>
+                <div class="card-body">
+                    <form id="form-margem" class="needs-validation" novalidate>
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                                <label for="custo-margem" class="form-label">Preço de Custo (R$)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="text" class="form-control money-mask" id="custo-margem" required>
+                                    <div class="invalid-feedback">Informe o preço de custo.</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="preco-venda-margem" class="form-label">Preço de Venda (R$)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="text" class="form-control money-mask" id="preco-venda-margem" required>
+                                    <div class="invalid-feedback">Informe o preço de venda.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Calcular Margem</button>
+                        </div>
+                    </form>
+                    
+                    <div id="resultado-margem" class="mt-3 d-none">
+                        <div class="alert alert-info">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <h5>Margem de Lucro</h5>
+                                    <h3 class="text-primary" id="margem-percentual">0,00%</h3>
+                                </div>
+                                <div class="col-sm-6">
+                                    <h5>Lucro (R$)</h5>
+                                    <h3 class="text-success" id="lucro-valor">R$ 0,00</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Calculadora de Preço de Venda -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="my-0">Calcular Preço de Venda</h5>
+                </div>
+                <div class="card-body">
+                    <form id="form-preco-venda" class="needs-validation" novalidate>
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                                <label for="custo-preco" class="form-label">Preço de Custo (R$)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="text" class="form-control money-mask" id="custo-preco" required>
+                                    <div class="invalid-feedback">Informe o preço de custo.</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="margem-desejada" class="form-label">Margem Desejada (%)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="margem-desejada" step="0.1" min="0.1" max="99.9" required>
+                                    <span class="input-group-text">%</span>
+                                    <div class="invalid-feedback">Informe a margem desejada.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Calcular Preço de Venda</button>
+                        </div>
+                    </form>
+                    
+                    <div id="resultado-preco" class="mt-3 d-none">
+                        <div class="alert alert-info">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <h5>Preço de Venda</h5>
+                                    <h3 class="text-primary" id="preco-venda-calculado">R$ 0,00</h3>
+                                </div>
+                                <div class="col-sm-6">
+                                    <h5>Lucro (R$)</h5>
+                                    <h3 class="text-success" id="lucro-calculado">R$ 0,00</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Calculadora de Preço por Markup -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="my-0">Calcular por Markup</h5>
+                </div>
+                <div class="card-body">
+                    <form id="form-markup" class="needs-validation" novalidate>
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                                <label for="custo-markup" class="form-label">Preço de Custo (R$)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="text" class="form-control money-mask" id="custo-markup" required>
+                                    <div class="invalid-feedback">Informe o preço de custo.</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="markup" class="form-label">Markup (multiplicador)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">x</span>
+                                    <input type="number" class="form-control" id="markup" step="0.1" min="1.0" required>
+                                    <div class="invalid-feedback">Informe o markup.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Calcular Preço por Markup</button>
+                        </div>
+                    </form>
+                    
+                    <div id="resultado-markup" class="mt-3 d-none">
+                        <div class="alert alert-info">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <h5>Preço de Venda</h5>
+                                    <h3 class="text-primary" id="preco-markup">R$ 0,00</h3>
+                                </div>
+                                <div class="col-sm-6">
+                                    <h5>Margem (%)</h5>
+                                    <h3 class="text-success" id="margem-markup">0,00%</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Análise Completa -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="my-0">Análise Completa</h5>
+                </div>
+                <div class="card-body">
+                    <form id="form-analise" class="needs-validation" novalidate>
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                                <label for="custo-analise" class="form-label">Preço de Custo (R$)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="text" class="form-control money-mask" id="custo-analise" required>
+                                    <div class="invalid-feedback">Informe o preço de custo.</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="preco-venda-analise" class="form-label">Preço de Venda (R$)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="text" class="form-control money-mask" id="preco-venda-analise" required>
+                                    <div class="invalid-feedback">Informe o preço de venda.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <label for="quantidade" class="form-label">Quantidade</label>
+                                <input type="number" class="form-control" id="quantidade" min="1" value="1" required>
+                                <div class="invalid-feedback">Informe a quantidade.</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="impostos" class="form-label">Impostos (%)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="impostos" min="0" max="100" step="0.1" value="0">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="custos-fixos" class="form-label">Custos Fixos (R$)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="text" class="form-control money-mask" id="custos-fixos" value="0">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Analisar Produto</button>
+                        </div>
+                    </form>
+                    
+                    <div id="resultado-analise" class="mt-3 d-none">
+                        <div class="alert alert-info">
+                            <div class="row">
+                                <div class="col-md-4 mb-2">
+                                    <h6>Preço de Venda</h6>
+                                    <p class="mb-0 h5" id="analise-preco-venda">R$ 0,00</p>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <h6>Margem de Lucro</h6>
+                                    <p class="mb-0 h5" id="analise-margem">0,00%</p>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <h6>Lucro Unitário</h6>
+                                    <p class="mb-0 h5" id="analise-lucro-unitario">R$ 0,00</p>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-4 mb-2">
+                                    <h6>Lucro Total</h6>
+                                    <p class="mb-0 h5" id="analise-lucro-total">R$ 0,00</p>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <h6>Valor Impostos</h6>
+                                    <p class="mb-0 h5" id="analise-impostos">R$ 0,00</p>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <h6>Preço Líquido</h6>
+                                    <p class="mb-0 h5" id="analise-preco-liquido">R$ 0,00</p>
+                                </div>
+                            </div>
+                            <div class="row mt-3" id="row-ponto-equilibrio">
+                                <div class="col-md-6 mb-2">
+                                    <h6>Ponto de Equilíbrio</h6>
+                                    <p class="mb-0 h5" id="analise-ponto-equilibrio">0 unidades</p>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <h6>Retorno do Investimento</h6>
+                                    <p class="mb-0 h5" id="analise-roi">0,00%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="my-0">Dicas sobre Margem vs. Markup</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Margem de Lucro</h5>
+                            <p><strong>Fórmula 1 (sobre preço):</strong> (Preço de Venda - Custo) / Preço de Venda × 100%</p>
+                            <p><strong>Fórmula 2 (sobre custo):</strong> Valor da Margem = Custo × Margem%</p>
+                            <p>Exemplo: Se um produto custa R$ 50 e deseja uma margem de 60%, o preço será R$ 80 (R$ 50 + 60% de R$ 50).</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Markup</h5>
+                            <p><strong>Fórmula:</strong> Preço de Venda / Custo</p>
+                            <p>É o multiplicador aplicado ao custo para obter o preço de venda.</p>
+                            <p>Exemplo: Um markup de 2.0 significa que o preço de venda é 2 vezes o custo.</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="text-primary">Tabela de Conversão</h5>
+                            <table class="table table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Margem (%)</th>
+                                        <th>Markup (multiplicador)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>10%</td><td>1,11</td></tr>
+                                    <tr><td>20%</td><td>1,25</td></tr>
+                                    <tr><td>30%</td><td>1,43</td></tr>
+                                    <tr><td>40%</td><td>1,67</td></tr>
+                                    <tr><td>50%</td><td>2,00</td></tr>
+                                    <tr><td>60%</td><td>2,50</td></tr>
+                                    <tr><td>70%</td><td>3,33</td></tr>
+                                    <tr><td>80%</td><td>5,00</td></tr>
+                                    <tr><td>90%</td><td>10,00</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Máscaras de moeda
+    const moneyInputs = document.querySelectorAll('.money-mask');
+    moneyInputs.forEach(input => {
+        input.addEventListener('input', function(e) {
+            let value = e.target.value;
+            value = value.replace(/\D/g, '');
+            value = value.replace(/(\d)(\d{2})$/, '$1,$2');
+            value = value.replace(/(?=(\d{3})+(\D))\B/g, '.');
+            e.target.value = value;
+        });
+    });
+    
+    // Função para converter valores monetários brasileiros em números
+    function convertBRLToFloat(value) {
+        if (!value) return 0;
+        return parseFloat(value.replace(/\./g, '').replace(',', '.'));
+    }
+    
+    // Função para formatar valores monetários
+    function formatMoney(value) {
+        return value.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+    
+    // Função para formatar porcentagem
+    function formatPercent(value) {
+        return value.toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }) + '%';
+    }
+    
+    // Validação de formulários
+    const forms = document.querySelectorAll('.needs-validation');
+    
+    // Calculadora de Margem
+    const formMargem = document.getElementById('form-margem');
+    formMargem.addEventListener('submit', function(event) {
+        event.preventDefault();
+        if (!formMargem.checkValidity()) {
+            event.stopPropagation();
+            formMargem.classList.add('was-validated');
+            return;
+        }
+        
+        const custoInput = document.getElementById('custo-margem');
+        const precoVendaInput = document.getElementById('preco-venda-margem');
+        const custo = convertBRLToFloat(custoInput.value);
+        const precoVenda = convertBRLToFloat(precoVendaInput.value);
+        
+        if (custo <= 0 || precoVenda <= 0 || precoVenda <= custo) {
+            alert('Valores inválidos. O preço de venda deve ser maior que o custo e ambos devem ser maiores que zero.');
+            return;
+        }
+        
+        // Chamar a API
+        fetch('/api/calculadora/margem', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                custo: custo,
+                preco_venda: precoVenda
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('margem-percentual').innerText = formatPercent(data.margem);
+                document.getElementById('lucro-valor').innerText = formatMoney(data.lucro);
+                document.getElementById('resultado-margem').classList.remove('d-none');
+            } else {
+                alert('Erro: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Ocorreu um erro ao calcular a margem.');
+        });
+    });
+    
+    // Calculadora de Preço de Venda
+    const formPrecoVenda = document.getElementById('form-preco-venda');
+    formPrecoVenda.addEventListener('submit', function(event) {
+        event.preventDefault();
+        if (!formPrecoVenda.checkValidity()) {
+            event.stopPropagation();
+            formPrecoVenda.classList.add('was-validated');
+            return;
+        }
+        
+        const custoInput = document.getElementById('custo-preco');
+        const margemInput = document.getElementById('margem-desejada');
+        const custo = convertBRLToFloat(custoInput.value);
+        const margem = parseFloat(margemInput.value);
+        
+        if (custo <= 0 || margem <= 0 || margem >= 100) {
+            alert('Valores inválidos. O custo deve ser maior que zero e a margem deve estar entre 0 e 100.');
+            return;
+        }
+        
+        // Chamar a API
+        fetch('/api/calculadora/preco-venda', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                custo: custo,
+                margem: margem
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('preco-venda-calculado').innerText = formatMoney(data.preco_venda);
+                document.getElementById('lucro-calculado').innerText = formatMoney(data.lucro);
+                document.getElementById('resultado-preco').classList.remove('d-none');
+            } else {
+                alert('Erro: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Ocorreu um erro ao calcular o preço de venda.');
+        });
+    });
+    
+    // Calculadora de Markup
+    const formMarkup = document.getElementById('form-markup');
+    formMarkup.addEventListener('submit', function(event) {
+        event.preventDefault();
+        if (!formMarkup.checkValidity()) {
+            event.stopPropagation();
+            formMarkup.classList.add('was-validated');
+            return;
+        }
+        
+        const custoInput = document.getElementById('custo-markup');
+        const markupInput = document.getElementById('markup');
+        const custo = convertBRLToFloat(custoInput.value);
+        const markup = parseFloat(markupInput.value);
+        
+        if (custo <= 0 || markup <= 0) {
+            alert('Valores inválidos. O custo e o markup devem ser maiores que zero.');
+            return;
+        }
+        
+        // Chamar a API
+        fetch('/api/calculadora/preco-markup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                custo: custo,
+                markup: markup
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('preco-markup').innerText = formatMoney(data.preco_venda);
+                document.getElementById('margem-markup').innerText = formatPercent(data.margem);
+                document.getElementById('resultado-markup').classList.remove('d-none');
+            } else {
+                alert('Erro: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Ocorreu um erro ao calcular o preço por markup.');
+        });
+    });
+    
+    // Análise Completa
+    const formAnalise = document.getElementById('form-analise');
+    formAnalise.addEventListener('submit', function(event) {
+        event.preventDefault();
+        if (!formAnalise.checkValidity()) {
+            event.stopPropagation();
+            formAnalise.classList.add('was-validated');
+            return;
+        }
+        
+        const custoInput = document.getElementById('custo-analise');
+        const precoVendaInput = document.getElementById('preco-venda-analise');
+        const quantidadeInput = document.getElementById('quantidade');
+        const impostosInput = document.getElementById('impostos');
+        const custosFixosInput = document.getElementById('custos-fixos');
+        
+        const custo = convertBRLToFloat(custoInput.value);
+        const precoVenda = convertBRLToFloat(precoVendaInput.value);
+        const quantidade = parseInt(quantidadeInput.value);
+        const impostos = parseFloat(impostosInput.value);
+        const custosFixos = convertBRLToFloat(custosFixosInput.value);
+        
+        if (custo <= 0 || precoVenda <= 0 || quantidade <= 0) {
+            alert('Valores inválidos. O custo, preço de venda e quantidade devem ser maiores que zero.');
+            return;
+        }
+        
+        // Chamar a API
+        fetch('/api/calculadora/analise', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                custo: custo,
+                preco_venda: precoVenda,
+                quantidade: quantidade,
+                impostos: impostos,
+                custos_fixos: custosFixos
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const resultado = data.resultado;
+                
+                document.getElementById('analise-preco-venda').innerText = formatMoney(resultado.preco_venda);
+                document.getElementById('analise-margem').innerText = formatPercent(resultado.margem_percentual);
+                document.getElementById('analise-lucro-unitario').innerText = formatMoney(resultado.lucro_unitario);
+                document.getElementById('analise-lucro-total').innerText = formatMoney(resultado.lucro_total);
+                document.getElementById('analise-impostos').innerText = formatMoney(resultado.valor_impostos);
+                document.getElementById('analise-preco-liquido').innerText = formatMoney(resultado.preco_liquido);
+                document.getElementById('analise-roi').innerText = formatPercent(resultado.retorno_investimento);
+                
+                if (resultado.ponto_equilibrio > 0) {
+                    document.getElementById('analise-ponto-equilibrio').innerText = resultado.ponto_equilibrio + ' unidades';
+                    document.getElementById('row-ponto-equilibrio').classList.remove('d-none');
+                } else {
+                    document.getElementById('row-ponto-equilibrio').classList.add('d-none');
+                }
+                
+                document.getElementById('resultado-analise').classList.remove('d-none');
+            } else {
+                alert('Erro: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Ocorreu um erro ao realizar a análise.');
+        });
+    });
+});
+</script>
+{% endblock %}
